@@ -1,5 +1,6 @@
 ARG PYTHON_VERSION=3.11.6
 ARG DEBIAN_BASE=bookworm
+RUN --mount=type=secret,id=fcm_access,env=FCM_ACCESS
 FROM python:${PYTHON_VERSION}-slim-${DEBIAN_BASE} AS base
 
 COPY resources/nginx-template.conf /templates/nginx/frappe.conf.template
