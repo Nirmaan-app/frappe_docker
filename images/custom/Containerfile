@@ -1,6 +1,5 @@
 ARG PYTHON_VERSION=3.11.6
 ARG DEBIAN_BASE=bookworm
-RUN --mount=type=secret,id=fcm_access,env=FCM_ACCESS
 FROM python:${PYTHON_VERSION}-slim-${DEBIAN_BASE} AS base
 
 COPY resources/nginx-template.conf /templates/nginx/frappe.conf.template
@@ -115,6 +114,7 @@ USER frappe
 
 ARG FRAPPE_BRANCH=version-15
 ARG FRAPPE_PATH=https://github.com/frappe/frappe
+RUN --mount=type=secret,id=fcm_access,env=FCM_ACCESS
 RUN export APP_INSTALL_ARGS="" && \
   echo "FCM_ACCESS: ${FCM_ACCESS}" && \
   echo "${FCM_ACCESS}" > /home/frappe/fcm.env && \
