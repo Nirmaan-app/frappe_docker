@@ -115,7 +115,7 @@ USER frappe
 ARG FRAPPE_BRANCH=version-15
 ARG FRAPPE_PATH=https://github.com/frappe/frappe
 RUN export APP_INSTALL_ARGS="" && \
-  echo "FCM_ACCESS PRINT: ${FCM_ACCESS} && \"
+  echo "FCM_ACCESS: ${FCM_ACCESS}" && \
   echo "${FCM_ACCESS}" > /home/frappe/fcm.env && \
   if [ -n "${APPS_JSON_BASE64}" ]; then \
     export APP_INSTALL_ARGS="--apps_path=/opt/frappe/apps.json"; \
