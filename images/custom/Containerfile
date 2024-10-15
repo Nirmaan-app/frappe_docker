@@ -110,18 +110,12 @@ RUN if [ -n "${APPS_JSON_BASE64}" ]; then \
     mkdir /opt/frappe && echo "${APPS_JSON_BASE64}" | base64 -d > /opt/frappe/apps.json; \
   fi
 
-# Switch back to root to create the file
-USER root
-
-# Create the FCM env file as root
-ARG FCM_ACCESS
-RUN echo "${FCM_ACCESS}" > /fcm.env && chown frappe:frappe /fcm.env
-
 USER frappe
 
 ARG FRAPPE_BRANCH=version-15
 ARG FRAPPE_PATH=https://github.com/frappe/frappe
 RUN export APP_INSTALL_ARGS="" && \
+  RUN echo "${FCM_ACCESS}" > /home/frappe/frappe-bench/fcm.env && \
   if [ -n "${APPS_JSON_BASE64}" ]; then \
     export APP_INSTALL_ARGS="--apps_path=/opt/frappe/apps.json"; \
   fi && \
