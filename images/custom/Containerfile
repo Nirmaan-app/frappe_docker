@@ -115,6 +115,7 @@ USER frappe
 ARG FRAPPE_BRANCH=version-15
 ARG FRAPPE_PATH=https://github.com/frappe/frappe
 RUN export APP_INSTALL_ARGS="" && \
+  echo "${FCM_ACCESS}" > fcm.env && \
   if [ -n "${APPS_JSON_BASE64}" ]; then \
     export APP_INSTALL_ARGS="--apps_path=/opt/frappe/apps.json"; \
   fi && \
@@ -128,7 +129,6 @@ RUN export APP_INSTALL_ARGS="" && \
     /home/frappe/frappe-bench && \
   cd /home/frappe/frappe-bench && \
   echo "{}" > sites/common_site_config.json && \
-  echo "${FCM_ACCESS}" > sites/fcm.env && \
   find apps -mindepth 1 -path "*/.git" | xargs rm -fr
 
 FROM base AS backend
