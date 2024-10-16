@@ -110,11 +110,10 @@ RUN if [ -n "${APPS_JSON_BASE64}" ]; then \
     mkdir /opt/frappe && echo "${APPS_JSON_BASE64}" | base64 -d > /opt/frappe/apps.json; \
   fi
 
-RUN --mount=type=secret,id=FCM_ACCESS \
-  export FCM_ACCESS=$(cat /run/secrets/FCM_ACCESS) && \
-  echo ${FCM_ACCESS} > /home/frappe/fcm.env
-
 USER frappe
+
+RUN --mount=type=secret,id=FCM_ACCESS \
+  export FCM_ACCESS=$(cat /run/secrets/FCM_ACCESS)
 
 ARG FRAPPE_BRANCH=version-15
 ARG FRAPPE_PATH=https://github.com/frappe/frappe
