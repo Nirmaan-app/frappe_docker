@@ -113,7 +113,7 @@ RUN if [ -n "${APPS_JSON_BASE64}" ]; then \
 
 RUN --mount=type=secret,id=FCM_ACCESS \
   export FCM_ACCESS=$(cat /run/secrets/FCM_ACCESS) && \
-  echo ${FCM_ACCESS} > /home/frappe/frappe_bench/sites/fcm.env && \
+  echo ${FCM_ACCESS} > /home/frappe/frappe-bench/sites/fcm.env && \
   chown frappe:frappe /home/frappe/frappe-bench/sites/fcm.env
 
 USER frappe
