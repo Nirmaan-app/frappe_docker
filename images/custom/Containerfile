@@ -144,6 +144,9 @@ RUN export APP_INSTALL_ARGS="" && \
 
 FROM base AS backend
 
+COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 USER frappe
 
 COPY --from=builder --chown=frappe:frappe /home/frappe/frappe-bench /home/frappe/frappe-bench
@@ -168,6 +171,3 @@ CMD [ \
   "--preload", \
   "frappe.app:application" \
 ]
-
-COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
