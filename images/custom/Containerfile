@@ -70,7 +70,8 @@ RUN useradd -ms /bin/bash frappe \
     && chown -R frappe:frappe /var/lib/nginx \
     && chown -R frappe:frappe /run/nginx.pid \
     && chmod 755 /usr/local/bin/nginx-entrypoint.sh \
-    && chmod 644 /templates/nginx/frappe.conf.template
+    && chmod 644 /templates/nginx/frappe.conf.template \
+    && mkdir -p /home/frappe/frappe-bench/sites
 
 FROM base AS builder
 
@@ -112,8 +113,8 @@ RUN if [ -n "${APPS_JSON_BASE64}" ]; then \
 
 RUN --mount=type=secret,id=FCM_ACCESS \
   export FCM_ACCESS=$(cat /run/secrets/FCM_ACCESS) && \
-  echo ${FCM_ACCESS} > /home/frappe/fcm.env && chown frappe:frappe /home/frappe/fcm.env && \
-  cat /home/frappe/fcm.env
+  echo ${FCM_ACCESS} > /home/frappe/frappe_bench/sites/fcm.env && \
+  chown frappe:frappe /home/frappe/frappe-bench/sites/fcm.env
 
 USER frappe
 
@@ -123,7 +124,7 @@ RUN export APP_INSTALL_ARGS="" && \
   if [ -n "${APPS_JSON_BASE64}" ]; then \
     export APP_INSTALL_ARGS="--apps_path=/opt/frappe/apps.json"; \
   fi && \
-  bench init ${APP_INSTALL_ARGS}\
+  bench init \
     --frappe-branch=${FRAPPE_BRANCH} \
     --frappe-path=${FRAPPE_PATH} \
     --no-procfile \
