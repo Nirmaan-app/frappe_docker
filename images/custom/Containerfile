@@ -38,6 +38,7 @@ RUN useradd -ms /bin/bash frappe \
     wait-for-it \
     jq \
     && mkdir -p /home/frappe/frappe-bench \
+    && mkdir -p /home/frappe/frappe-bench/sites \
     && chown -R frappe:frappe /home/frappe/frappe-bench \
     # NodeJS
     && mkdir -p ${NVM_DIR} \
