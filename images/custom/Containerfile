@@ -168,3 +168,6 @@ CMD [ \
   "--preload", \
   "frappe.app:application" \
 ]
+
+COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
