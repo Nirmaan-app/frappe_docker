@@ -39,7 +39,6 @@ RUN useradd -ms /bin/bash frappe \
     jq \
     && mkdir -p /home/frappe/frappe-bench \
     && chown -R frappe:frappe /home/frappe/frappe-bench
-
     # NodeJS
     && mkdir -p ${NVM_DIR} \
     && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash \
