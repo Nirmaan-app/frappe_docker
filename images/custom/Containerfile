@@ -37,6 +37,9 @@ RUN useradd -ms /bin/bash frappe \
     # For healthcheck
     wait-for-it \
     jq \
+    && mkdir -p /home/frappe/frappe-bench \
+    && chown -R frappe:frappe /home/frappe/frappe-bench
+
     # NodeJS
     && mkdir -p ${NVM_DIR} \
     && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash \
@@ -70,8 +73,10 @@ RUN useradd -ms /bin/bash frappe \
     && chown -R frappe:frappe /var/lib/nginx \
     && chown -R frappe:frappe /run/nginx.pid \
     && chmod 755 /usr/local/bin/nginx-entrypoint.sh \
-    && chmod 644 /templates/nginx/frappe.conf.template \
-    && mkdir -p /home/frappe/frappe-bench/sites
+    && chmod 644 /templates/nginx/frappe.conf.template
+
+RUN chown -R frappe:frappe /home/frappe/frappe-bench \
+    && chmod -R 755 /home/frappe/frappe-bench
 
 FROM base AS builder
 
