@@ -13,9 +13,10 @@ RUN if [ -n "${APPS_JSON_BASE64}" ]; then \
   fi
 
 RUN --mount=type=secret,id=FCM_ACCESS \
-  export FCM_ACCESS=$(cat /run/secrets/FCM_ACCESS) && \
-  echo ${FCM_ACCESS} > /home/frappe/frappe-bench/sites/fcm.env && \
-  chown frappe:frappe /home/frappe/frappe-bench/sites/fcm.env
+  export FCM_ACCESS=$(cat /run/secrets/FCM_ACCESS)
+# export FCM_ACCESS=$(cat /run/secrets/FCM_ACCESS) && \
+#   echo ${FCM_ACCESS} > /home/frappe/frappe-bench/sites/fcm.env && \
+#   chown frappe:frappe /home/frappe/frappe-bench/sites/fcm.env
 
 USER frappe
 
@@ -37,14 +38,14 @@ RUN export APP_INSTALL_ARGS="" && \
 
 FROM frappe/base:${FRAPPE_BRANCH} AS backend
 
-COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
 USER frappe
 
 COPY --from=builder --chown=frappe:frappe /home/frappe/frappe-bench /home/frappe/frappe-bench
 
 WORKDIR /home/frappe/frappe-bench
+
+COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 VOLUME [ \
   "/home/frappe/frappe-bench/sites", \
