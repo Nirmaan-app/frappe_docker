@@ -28,11 +28,24 @@ cd frappe_docker
 
 Then run: `docker compose -f pwd.yml up -d`
 
+### To run on ARM64 architecture follow this instructions
+
+After cloning the repo run this command to build multi-architecture images specifically for ARM64.
+
+`docker buildx bake --no-cache --set "*.platform=linux/arm64"`
+
+and then
+
+- add `platform: linux/arm64` to all services in the pwd.yaml
+- replace the current specified versions of erpnext image on `pwd.yml` with `:latest`
+
+Then run: `docker compose -f pwd.yml up -d`
+
 ## Final steps
 
 Wait for 5 minutes for ERPNext site to be created or check `create-site` container logs before opening browser on port 8080. (username: `Administrator`, password: `admin`)
 
-If you ran in a Dev Docker environment, to view container logs: `docker compose -f pwd.yml -d`. Don't worry about some of the initial error messages, some services take a while to become ready, and then they go away.
+If you ran in a Dev Docker environment, to view container logs: `docker compose -f pwd.yml logs -f create-site`. Don't worry about some of the initial error messages, some services take a while to become ready, and then they go away.
 
 # Documentation
 
@@ -50,10 +63,12 @@ If you ran in a Dev Docker environment, to view container logs: `docker compose 
 - [Port Based Multi Tenancy](docs/port-based-multi-tenancy.md)
 - [Migrate from multi-image setup](docs/migrate-from-multi-image-setup.md)
 - [running on linux/mac](docs/setup_for_linux_mac.md)
+- [TLS for local deployment](docs/tls-for-local-deployment.md)
 
 ### [Custom Images](#custom-images)
 
 - [Custom Apps](docs/custom-apps.md)
+- [Custom Apps with podman](docs/custom-apps-podman.md)
 - [Build Version 10 Images](docs/build-version-10-images.md)
 
 ### [Development](#development)
