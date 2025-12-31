@@ -38,6 +38,14 @@ RUN export APP_INSTALL_ARGS="" && \
 
 FROM frappe/base:${FRAPPE_BRANCH} AS backend
 
+USER root
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    poppler-utils \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
 USER frappe
 
 COPY --from=builder --chown=frappe:frappe /home/frappe/frappe-bench /home/frappe/frappe-bench
