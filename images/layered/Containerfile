@@ -52,24 +52,33 @@ COPY --from=builder --chown=frappe:frappe /home/frappe/frappe-bench /home/frappe
 
 WORKDIR /home/frappe/frappe-bench
 
-# COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
-# RUN chmod +x /usr/local/bin/entrypoint.sh
+# Bake built assets into the image layer, OUTSIDE any volume. A named volume is
+# only populated from the image the first time it is created, so when assets
+# live in the `sites` volume new releases never refresh them -> users get stale
+# JS/CSS after a deploy. main-entrypoint.sh re-links these into sites/assets on
+# every container start, so the served assets always match the deployed image.
+RUN cp -r /home/frappe/frappe-bench/sites/assets /home/frappe/frappe-bench/assets && \
+  rm -rf /home/frappe/frappe-bench/sites/assets
 
-VOLUME [ \
-  "/home/frappe/frappe-bench/sites", \
-  "/home/frappe/frappe-bench/sites/assets", \
-  "/home/frappe/frappe-bench/logs" \
-  ]
+# Only declare the `sites` volume. The previous nested declarations for
+# `sites/assets` and `logs` spawned a fresh anonymous volume on every container
+# recreation — hundreds of orphaned volumes accumulated over redeploys and
+# filled the disk. Assets are now baked into the image (above); logs write to
+# the container layer (map a named `logs` volume in compose to persist them).
+VOLUME [ "/home/frappe/frappe-bench/sites" ]
 
-CMD [ \
-  "/home/frappe/frappe-bench/env/bin/gunicorn", \
-  "--chdir=/home/frappe/frappe-bench/sites", \
-  "--bind=0.0.0.0:8000", \
-  "--threads=10", \
-  "--workers=1", \
-  "--worker-class=gthread", \
-  "--worker-tmp-dir=/dev/shm", \
-  "--timeout=120", \
-  "--preload", \
-  "frappe.app:application" \
-  ]
+# Env-driven Gunicorn launcher (replaces the hardcoded single-worker CMD).
+# Worker/thread/timeout counts are now tunable at deploy time via
+# GUNICORN_WORKERS / GUNICORN_THREADS / GUNICORN_TIMEOUT — no rebuild needed.
+USER root
+COPY resources/start.sh /usr/local/bin/start.sh
+RUN chmod 755 /usr/local/bin/start.sh
+# Entrypoint symlinks the baked assets into the sites volume on every start,
+# then exec's the CMD. Runs for every service that doesn't override entrypoint
+# (configurator overrides it, so it is unaffected).
+COPY resources/main-entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod 755 /usr/local/bin/entrypoint.sh
+USER frappe
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["/usr/local/bin/start.sh"]

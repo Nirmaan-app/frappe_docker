@@ -4,6 +4,7 @@ x-customizable-image: &customizable_image
   # about using custom images.
   image: ${CUSTOM_IMAGE:-frappe/erpnext}:${CUSTOM_TAG:-$ERPNEXT_VERSION}
   pull_policy: ${PULL_POLICY:-always}
+  restart: ${RESTART_POLICY:-unless-stopped}
 
 x-depends-on-configurator: &depends_on_configurator
   depends_on:
@@ -19,6 +20,9 @@ services:
   configurator:
     <<: *backend_defaults
     platform: linux/amd64
+    # One-shot job: must NOT inherit the anchor's restart policy, or it would
+    # loop after completing successfully.
+    restart: "no"
     entrypoint:
       - bash
       - -c
@@ -43,6 +47,13 @@ services:
   backend:
     <<: *backend_defaults
     platform: linux/amd64
+    # Web-tier concurrency — tunable WITHOUT rebuilding the image (read by
+    # resources/start.sh). Sized for a 2 vCPU / 8 GB all-in-one box; keep
+    # (workers x threads) well under Postgres max_connections (default 100).
+    environment:
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS:-3}
+      GUNICORN_THREADS: ${GUNICORN_THREADS:-4}
+      GUNICORN_TIMEOUT: ${GUNICORN_TIMEOUT:-120}
 
   frontend:
     <<: *customizable_image
