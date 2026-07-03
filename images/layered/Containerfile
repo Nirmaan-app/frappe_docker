@@ -65,7 +65,7 @@ CMD [ \
   "/home/frappe/frappe-bench/env/bin/gunicorn", \
   "--chdir=/home/frappe/frappe-bench/sites", \
   "--bind=0.0.0.0:8000", \
-  "--threads=10", \
+  "--threads=20", \
   "--workers=1", \
   "--worker-class=gthread", \
   "--worker-tmp-dir=/dev/shm", \
